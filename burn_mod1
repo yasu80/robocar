@@ -1,0 +1,42 @@
+#!/bin/sh
+
+#************************************
+#Newer(Release,Debug)_will_be_build
+#************************************
+
+if [ ! $# = 1 ]; then
+    echo USAGE: $0 project_name
+    exit
+fi
+
+if [ /home/yasu/LPCXpresso/workspace/$1/Release/$1.bin -nt /home/yasu/LPCXpresso/workspace/$1/Debug/$1.bin ]; then
+   binary=/home/yasu/LPCXpresso/workspace/$1/Release/$1.bin
+   echo MODE:Release_Build
+else 
+   binary=/home/yasu/LPCXpresso/workspace/$1/Debug/$1.bin
+   echo MODE:Debug_Build
+fi
+
+#binary="${HOME}/robocar/workspace/$1/Debug/$1.bin"
+
+
+CRP="/media/${USER}/CRP DISABLD"
+firmware="${CRP}/firmware.bin"
+
+if [ ! -f ${binary} ]; then
+    echo ERROR: ${binary} does not exist.
+    echo Aborted.
+    exit
+fi
+
+if [ ! -f "${firmware}" ]; then
+    echo WARN: robocar is not connected.
+    echo Aborted.
+    exit
+fi
+
+dd bs=1024 conv=nocreat,notrunc if="${binary}" of="${firmware}"
+
+umount "${CRP}"
+echo success.
+
